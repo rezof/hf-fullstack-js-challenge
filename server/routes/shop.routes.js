@@ -1,4 +1,5 @@
 const express = require('express')
+const chalk = require('chalk')
 const jwt = require('jsonwebtoken')
 const shopController = require('../controllers/shop.controller')
 
@@ -13,6 +14,7 @@ const verifyAuth = (req, res, next) => {
   if (token) {
     jwt.verify(token, process.env.JWT_SECRET, function(err, decoded) {
       if (err) {
+        console.log(chalk.red('token not valid', err))
         res.statusCode = 401
         res.json({ errors: ['token not valid'] })
       } else {
@@ -29,5 +31,6 @@ const verifyAuth = (req, res, next) => {
 router.get('/shops', verifyAuth, shopController.fetchAll)
 router.post('/shop/like/:id', verifyAuth, shopController.likeShop)
 router.post('/shop/unlike/:id', verifyAuth, shopController.unlikeShop)
+router.post('/shop/dislike/:id', verifyAuth, shopController.dislikeShop)
 
 module.exports = router

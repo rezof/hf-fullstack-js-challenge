@@ -1,6 +1,8 @@
 const chalk = require('chalk')
 const ShopModel = require('../models/shop.model')
 const LikeModel = require('../models/like.model')
+const DislikeModel = require('../models/dislike.model')
+
 const { distanceBetweenTwoPoints } = require('../utils')
 
 /**
@@ -114,8 +116,37 @@ const unlikeShop = (req, res) => {
   )
 }
 
+/**
+ * route: /shop/dislike/:id
+ * dislike shop
+ * @param id : shop id
+ *
+ * @return {*}
+ * **/
+const dislikeShop = (req, res) => {
+  const { id: user_id } = req.user
+  const shop_id = req.params.id
+
+  DislikeModel.create(
+    {
+      user_id,
+      shop_id
+    },
+    (err, like) => {
+      if (err) {
+        console.log(chalk.red('failed to save dislike', err))
+        res.statusCode = 500
+        res.json({ error: ['failed to save dislike'] })
+      } else {
+        res.json({ success: true })
+      }
+    }
+  )
+}
+
 module.exports = {
   fetchAll,
   likeShop,
+  dislikeShop,
   unlikeShop
 }
