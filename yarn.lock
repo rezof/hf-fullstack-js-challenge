@@ -2082,6 +2082,12 @@ mongoose-legacy-pluralize@1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/mongoose-legacy-pluralize/-/mongoose-legacy-pluralize-1.0.1.tgz#31ae25db45c30f1448c0f93f52769e903367c701"
 
+mongoose-ttl@^0.0.3:
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/mongoose-ttl/-/mongoose-ttl-0.0.3.tgz#4a13dcc45db0296384c6b1f225df757a53bfe0e0"
+  dependencies:
+    ms "0.1.0"
+
 mongoose@^5.0.0-rc0:
   version "5.0.0-rc0"
   resolved "https://registry.yarnpkg.com/mongoose/-/mongoose-5.0.0-rc0.tgz#6b4d360b06db0af951da18bfd1b813a5385c25e0"
@@ -2110,6 +2116,10 @@ mquery@3.0.0-rc0:
     debug "2.6.9"
     regexp-clone "0.0.1"
     sliced "0.0.5"
+
+ms@0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/ms/-/ms-0.1.0.tgz#f21fac490daf1d7667fd180fe9077389cc9442b2"
 
 ms@2.0.0, ms@^2.0.0:
   version "2.0.0"

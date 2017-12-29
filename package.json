@@ -12,6 +12,7 @@
     "express": "^4.16.2",
     "jsonwebtoken": "^8.1.0",
     "mongoose": "^5.0.0-rc0",
+    "mongoose-ttl": "^0.0.3",
     "webpack": "3.9.0"
   },
   "devDependencies": {
