@@ -1,8 +1,10 @@
 const chalk = require('chalk')
 const ShopModel = require('../models/shop.model')
+const LikeModel = require('../models/like.model')
 const { distanceBetweenTwoPoints } = require('../utils')
 
 /**
+ * Route: /shops
  * return shops list ordered by distance asc
  * @param latitude
  * @param longitude
@@ -53,6 +55,35 @@ const fetchAll = (req, res) => {
     })
 }
 
+/**
+ * route: /shop/like/:id
+ * add shop to preferred list
+ * @param id : shop id
+ *
+ * @return {*}
+ * **/
+const likeShop = (req, res) => {
+  const { id: user_id } = req.user
+  const shop_id = req.params.id
+
+  LikeModel.create(
+    {
+      user_id,
+      shop_id
+    },
+    (err, like) => {
+      if (err) {
+        console.log(chalk.red('failed to create like', err))
+        res.statusCode = 500
+        res.json({ error: ['failed to save like'] })
+      } else {
+        res.json({ success: true })
+      }
+    }
+  )
+}
+
 module.exports = {
-  fetchAll
+  fetchAll,
+  likeShop
 }

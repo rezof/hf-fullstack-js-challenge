@@ -15,7 +15,10 @@ const verifyAuth = (req, res, next) => {
       if (err) {
         res.statusCode = 401
         res.json({ errors: ['token not valid'] })
-      } else next()
+      } else {
+        req.user = decoded
+        next()
+      }
     })
   } else {
     res.statusCode = 401
@@ -24,5 +27,6 @@ const verifyAuth = (req, res, next) => {
 }
 
 router.get('/shops', verifyAuth, shopController.fetchAll)
+router.post('/shop/like/:id', verifyAuth, shopController.likeShop)
 
 module.exports = router
