@@ -14,4 +14,14 @@ const ShopSchema = mongoose.Schema({
   }
 })
 
+ShopSchema.statics = {
+  all() {
+    return this.find()
+      .exec()
+      .then(shops => {
+        return shops
+      })
+  }
+}
+
 module.exports = mongoose.model('shops', ShopSchema)
