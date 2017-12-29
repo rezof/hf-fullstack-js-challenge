@@ -20,7 +20,7 @@ const register = (req, res) => {
       email,
       password
     },
-    (user, err) => {
+    (err, user) => {
       if (!err) {
         console.log(chalk.red('register error:', err))
         res.statusCode = 500
