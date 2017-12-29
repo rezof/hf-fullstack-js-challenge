@@ -42,6 +42,9 @@ UserSchema.statics = {
             reject(error)
           })
         })
+        .catch(err => {
+          reject(err)
+        })
     })
   }
 }
