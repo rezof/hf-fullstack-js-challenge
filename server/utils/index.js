@@ -11,7 +11,7 @@ if (typeof Number.prototype.toRad === 'undefined') {
 @param decimals
 @return {Function}
 **/
-const distanceBetweenTwoPoints = (start, decimals = 4) => {
+const distanceBetweenTwoPoints = (start, decimals = 2) => {
   const earthRadius = 6371 // km
   return end => {
     const lon1 = parseFloat(start.longitude)
@@ -29,7 +29,9 @@ const distanceBetweenTwoPoints = (start, decimals = 4) => {
       Math.sin(dLon / 2) * Math.sin(dLon / 2) * Math.cos(lat1) * Math.cos(lat2)
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
     const d = earthRadius * c
-    return Math.round(d * Math.pow(10, decimals)) / Math.pow(10, decimals)
+    return (
+      Math.round(d * Math.pow(10, decimals)) / Math.pow(10, decimals) * 1000
+    )
   }
 }
 
