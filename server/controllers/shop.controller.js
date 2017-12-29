@@ -10,14 +10,14 @@ const { distanceBetweenTwoPoints } = require('../utils')
  * @return {*}
  * **/
 const fetchAll = (req, res) => {
-  const { latitude, longitude } = req.query
+  const { latitude: lat1, longitude: lon2 } = req.query
 
-  const start = {
-    latitude: parseFloat(latitude),
-    longitude: parseFloat(longitude)
+  const p1 = {
+    latitude: parseFloat(lat1),
+    longitude: parseFloat(lon2)
   }
 
-  const getDistance = distanceBetweenTwoPoints(start)
+  const getDistance = distanceBetweenTwoPoints(p1)
   ShopModel.all()
     .then(shops => {
       const sortedShos = shops
@@ -28,12 +28,13 @@ const fetchAll = (req, res) => {
             name,
             picture,
             city,
-            location: { coordinates: [latitude, longitude] }
+            location: { coordinates: [lon2, lat2] }
           } = shop
-          const distance = getDistance({
-            latitude,
-            longitude
-          })
+          const p2 = {
+            latitude: lat2,
+            longitude: lon2
+          }
+          const distance = getDistance(p2)
           return {
             id,
             name,
