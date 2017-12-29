@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken')
 const chalk = require('chalk')
 const UserModel = require('../models/user.model')
 
-const { JWT_SECRET } = process.env
+const { JWT_SECRET, JWT_EXPIRATION } = process.env
 
 /**
  * creates new user
@@ -32,7 +32,7 @@ const register = (req, res) => {
 
 const generateToken = user => {
   return jwt.sign(user, JWT_SECRET, {
-    expiresIn: 1440 // expires in a day
+    expiresIn: JWT_EXPIRATION // expiration in seconds
   })
 }
 

@@ -24,4 +24,10 @@ if (!process.env.JWT_SECRET) {
   )
 }
 
+if (!process.env.JWT_LIFESPAN) {
+  throw new Error(
+    chalk.red('looks like you forgot to set JWT_LIFESPAN on the .env file')
+  )
+}
+
 module.exports = app
