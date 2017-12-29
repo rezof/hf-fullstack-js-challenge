@@ -28,5 +28,6 @@ const verifyAuth = (req, res, next) => {
 
 router.get('/shops', verifyAuth, shopController.fetchAll)
 router.post('/shop/like/:id', verifyAuth, shopController.likeShop)
+router.post('/shop/unlike/:id', verifyAuth, shopController.unlikeShop)
 
 module.exports = router

@@ -83,7 +83,39 @@ const likeShop = (req, res) => {
   )
 }
 
+/**
+ * route: /shop/unlike/:id
+ * remove shop from preferred list
+ * @param id : shop id
+ *
+ * @return {*}
+ * **/
+const unlikeShop = (req, res) => {
+  const { id: user_id } = req.user
+  const shop_id = req.params.id
+
+  LikeModel.findOneAndRemove(
+    {
+      user_id,
+      shop_id
+    },
+    (err, removed) => {
+      if (err) {
+        console.log(chalk.red('failed to remove like', err))
+        res.statusCode = 500
+        res.json({ error: ['failed to remove like'] })
+      } else if (removed) {
+        res.json({ success: true })
+      } else {
+        res.statusCode = 400
+        res.success({ success: false })
+      }
+    }
+  )
+}
+
 module.exports = {
   fetchAll,
-  likeShop
+  likeShop,
+  unlikeShop
 }
