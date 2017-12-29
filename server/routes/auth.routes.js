@@ -32,6 +32,34 @@ const verifyRegister = (req, res, next) => {
   } else next()
 }
 
+/**
+ * validates login parameters
+ * @param req
+ * @param res
+ * @param next
+ * @returns {*}
+ */
+const verifyLogin = (req, res, next) => {
+  const { email, password } = req.body
+  const errors = []
+
+  // check email
+  if (typeof email !== 'string') {
+    errors.push('email is required')
+  }
+
+  // verify password
+  if (typeof password !== 'string') {
+    errors.push('password is required')
+  }
+
+  if (errors.length > 0) {
+    res.statusCode = 401
+    res.json({ success: false, errors })
+  } else next()
+}
+
 router.post('/register', verifyRegister, authController.register)
+router.post('/login', verifyLogin, authController.login)
 
 module.exports = router

@@ -28,7 +28,13 @@ const register = (req, res) => {
 }
 
 const login = (req, res) => {
-  // handle user login
+  const { email, password } = req.body
+  UserModel.authenticate(email, password)
+    .then(user => res.json({ success: true, user }))
+    .catch(err => {
+      res.statusCode = 401
+      res.json({ success: false, errors: ['user not found'] })
+    })
 }
 
 module.exports = {
