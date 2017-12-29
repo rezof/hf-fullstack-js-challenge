@@ -1,5 +1,8 @@
-const UserModel = require('../models/user.model')
+const jwt = require('jsonwebtoken')
 const chalk = require('chalk')
+const UserModel = require('../models/user.model')
+
+const { JWT_SECRET } = process.env
 
 /**
  * creates new user
@@ -27,11 +30,21 @@ const register = (req, res) => {
   )
 }
 
+const generateToken = user => {
+  return jwt.sign(user, JWT_SECRET, {
+    expiresIn: 1440 // expires in a day
+  })
+}
+
 const login = (req, res) => {
   const { email, password } = req.body
   UserModel.authenticate(email, password)
-    .then(user => res.json({ success: true, user }))
+    .then(user => {
+      const token = generateToken(user)
+      res.json({ success: true, token })
+    })
     .catch(err => {
+      console.error('err', err)
       res.statusCode = 401
       res.json({ success: false, errors: ['user not found'] })
     })
