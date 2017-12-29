@@ -21,7 +21,7 @@ const register = (req, res) => {
       password
     },
     (err, user) => {
-      if (!err) {
+      if (err) {
         console.log(chalk.red('register error:', err))
         res.statusCode = 500
         res.json({ success: false, errors: ['failed to create user'] })
