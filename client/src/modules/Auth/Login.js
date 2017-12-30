@@ -80,6 +80,7 @@ export default class Login extends React.Component {
             return state
           })
         } else {
+          localStorage.setItem('access_token', data.token)
           this.props.history.push('/')
         }
       })
