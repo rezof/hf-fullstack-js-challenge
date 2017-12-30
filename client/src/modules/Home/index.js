@@ -18,12 +18,15 @@ const MenuBar = Styled.div`
   display: flex;
   justify-content: flex-end;
   align-items: center;
+  padding-right: 25px;
+  box-sizing: border-box;
 `
 
 const MenuBarItem = Styled.span`
   font-size: 16px;
   color: skyblue;
   padding: 5px 10px;
+  cursor: pointer;
   text-decoration: ${props => (props.active ? 'underline' : 'none')}
 `
 
@@ -32,7 +35,6 @@ const ContentWrapper = Styled.div`
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  justify-content: space-around;
   padding: 0 5%;
 `
 
@@ -43,7 +45,11 @@ const ShopContainer = Styled.div`
 
 class Home extends React.Component {
   state = {
-    shops: []
+    display: 'preferred',
+    shops: {
+      near: [],
+      preferred: []
+    }
   }
 
   componentWillMount() {
@@ -67,21 +73,41 @@ class Home extends React.Component {
       accept: 'application/json'
     })
       .then(result => result.json())
-      .then(({ shops = [] }) => {
-        this.setState({ shops })
+      .then(dt => {
+        if (dt.hasOwnProperty('shops')) {
+          this.setState(state => {
+            const { shops: { near = [], preferred = [] } } = dt
+            state.shops = {
+              near,
+              preferred
+            }
+            return state
+          })
+        }
       })
       .catch(err => this.setState({ error: 'failed to load shops' }))
   }
 
   render() {
+    const { shops, display } = this.state
     return (
       <Container>
         <MenuBar>
-          <MenuBarItem>Near By Shops</MenuBarItem>
-          <MenuBarItem>My Preffered Shops</MenuBarItem>
+          <MenuBarItem
+            active={display === 'near'}
+            onClick={() => this.setState({ display: 'near' })}
+          >
+            Near By Shops
+          </MenuBarItem>
+          <MenuBarItem
+            onClick={() => this.setState({ display: 'preferred' })}
+            active={display === 'preferred'}
+          >
+            My Preferred Shops
+          </MenuBarItem>
         </MenuBar>
         <ContentWrapper>
-          {this.state.shops.map(shop => <ShopItem key={shop.id} shop={shop} />)}
+          {shops[display].map(shop => <ShopItem key={shop.id} shop={shop} />)}
         </ContentWrapper>
       </Container>
     )

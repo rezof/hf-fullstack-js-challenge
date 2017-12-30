@@ -8,7 +8,7 @@ const Wrapper = Styled.div`
   display: flex;
   flex-direction: column;
   padding: 0 10px;
-  margin-bottom: 25px;
+  margin: 0 2% 25px;
   border: 1px solid grey;
 `
 
