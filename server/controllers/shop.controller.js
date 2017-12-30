@@ -6,6 +6,57 @@ const DislikeModel = require('../models/dislike.model')
 const { distanceBetweenTwoPoints } = require('../utils')
 
 /**
+ * calculates distance and returns an ordered shops list
+ * @param shops
+ * @param getDistanceFromUser
+ *
+ * @return {*}
+ */
+const sortShopsByDistance = (shops, getDistanceFromUser) => {
+  return shops
+    .map(shop => {
+      const { _id: id, name, picture, location } = shop
+      // shop coordinates
+      const p2 = {
+        latitude: location.coordinates.lat2,
+        longitude: location.coordinates.lon2
+      }
+      // distance between shop and user
+      const distance = getDistanceFromUser(p2)
+      return { id, name, picture, distance }
+    })
+    .sort((a, b) => a.distance - b.distance)
+}
+
+/**
+ * get shops disliked by user
+ * @param user_id
+ * return promise
+ */
+const getUserDislikedShops = user_id => {
+  return DislikeModel.findByUser(user_id)
+    .then(dislikes => dislikes.map(dislike => dislike.shop_id))
+    .catch(err => {
+      console.log(chalk.red('failed to load user liked shops', err))
+      return err
+    })
+}
+
+/**
+ * get shops liked by user ordered by distance
+ * @param user_id
+ * return promise
+ */
+const getUserLikedShops = (user_id, getDistanceFromUser) => {
+  return LikeModel.findByUser(user_id)
+    .then(shops => sortShopsByDistance(shops, getDistanceFromUser))
+    .catch(err => {
+      console.log(chalk.red('failed to load user liked shops', err))
+      return err
+    })
+}
+
+/**
  * Route: /shops
  * return shops list ordered by distance asc
  * @param latitude
@@ -15,45 +66,43 @@ const { distanceBetweenTwoPoints } = require('../utils')
  * **/
 const fetchAll = (req, res) => {
   const { latitude: lat1, longitude: lon2 } = req.query
+  const { user: { id: user_id } } = req
 
+  // user coordinates
   const p1 = {
     latitude: parseFloat(lat1),
     longitude: parseFloat(lon2)
   }
 
-  const getDistance = distanceBetweenTwoPoints(p1)
-  ShopModel.all()
-    .then(shops => {
-      const sortedShos = shops
-        .map(shop => {
-          const {
-            _id: id,
-            email,
-            name,
-            picture,
-            city,
-            location: { coordinates: [lon2, lat2] }
-          } = shop
-          const p2 = {
-            latitude: lat2,
-            longitude: lon2
-          }
-          const distance = getDistance(p2)
-          return {
-            id,
-            name,
-            email,
-            city,
-            picture,
-            distance
-          }
+  // curry getDistance with p1 in context
+  const getDistanceFromUser = distanceBetweenTwoPoints(p1)
+
+  Promise.all([
+    getUserLikedShops(user_id, getDistanceFromUser),
+    getUserDislikedShops(user_id)
+  ])
+    .then(dt => {
+      const [likedShops = [], dislikedShops = []] = dt
+      const exclude = likedShops.map(shop => shop.id).concat(dislikedShops)
+      ShopModel.all(exclude)
+        .then(shops => {
+          const nearShops = sortShopsByDistance(
+            shops,
+            getDistanceFromUser
+          ).slice(0, 30) // return 30 shops max
+
+          res.json({ shops: { near: nearShops, preferred: likedShops } })
         })
-        .sort((a, b) => a.distance - b.distance)
-      res.json({ shops: sortedShos })
+        .catch(err => {
+          console.log(chalk.red('failed to fetch shops', err))
+          rez.statusCode = 500
+          res.json({})
+        })
     })
     .catch(err => {
-      console.log(chalk.red('/shop: ', err))
-      res.json({ shops: [] })
+      console.log(chalk.red('failed to fetch liked/disliked shop', err))
+      rez.statusCode = 500
+      res.json({})
     })
 }
 
@@ -67,11 +116,10 @@ const fetchAll = (req, res) => {
 const likeShop = (req, res) => {
   const { id: user_id } = req.user
   const shop_id = req.params.id
-
   LikeModel.create(
     {
       user_id,
-      shop_id
+      shop: shop_id
     },
     (err, like) => {
       if (err) {

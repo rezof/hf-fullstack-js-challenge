@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const chalk = require('chalk')
 
 const ShopSchema = mongoose.Schema({
   email: String,
@@ -15,11 +16,12 @@ const ShopSchema = mongoose.Schema({
 })
 
 ShopSchema.statics = {
-  all() {
-    return this.find()
+  all(exclude = []) {
+    return this.find({ _id: { $nin: exclude } })
       .exec()
-      .then(shops => {
-        return shops
+      .catch(err => {
+        console.log(chalk.red('failed to fetch shops', err))
+        return err
       })
   }
 }
