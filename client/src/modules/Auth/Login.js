@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import Styled from 'styled-components'
 
 const Container = Styled.div`
@@ -53,7 +54,7 @@ const ErrorMsg = Styled.span`
   text-align: center;
 `
 
-export default class Login extends React.Component {
+class Login extends React.Component {
   constructor() {
     super()
     this.state = {
@@ -127,3 +128,9 @@ export default class Login extends React.Component {
     )
   }
 }
+
+Login.propTypes = {
+  history: PropTypes.object.isRequired
+}
+
+export default Login
