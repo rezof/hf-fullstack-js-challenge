@@ -152,7 +152,7 @@ class Home extends React.Component {
             )
             state.shops.preferred.push(likedShop)
             state.shops.preferred.sort((a, b) => a.distance > b.distance)
-            delete state.shops.near[index]
+            state.shops.near.splice(index, 1)
             return state
           })
         }
@@ -186,7 +186,7 @@ class Home extends React.Component {
             )
             state.shops.near.push(unlikedShop)
             state.shops.near.sort((a, b) => a.distance > b.distance)
-            delete state.shops.preferred[index]
+            state.shops.preferred.splice(index, 1)
             return state
           })
         }
