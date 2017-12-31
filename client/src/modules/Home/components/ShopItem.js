@@ -5,6 +5,7 @@ import Styled from 'styled-components'
 const Wrapper = Styled.div`
   width: 20%;
   max-width: 250px;
+  min-width: 100px;
   height: fit-content;
   display: flex;
   flex-direction: column;
