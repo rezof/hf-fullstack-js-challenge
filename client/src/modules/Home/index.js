@@ -70,10 +70,15 @@ const ErrorMsg = Styled.span`
   font-size: 14px;
 `
 
+const StatusMsg = ErrorMsg.extend`
+  color: black;
+`
+
 class Home extends React.Component {
   state = {
     selectedShops: 'near',
     error: '',
+    status: '',
     shops: {
       near: [],
       preferred: []
@@ -83,12 +88,6 @@ class Home extends React.Component {
   componentWillMount() {
     this.likeShopHandler = this.likeShopHandler.bind(this)
     this.dislikeShopHandler = this.dislikeShopHandler.bind(this)
-    const access_token = localStorage.getItem('access_token')
-
-    // redirect to login
-    if (!access_token) {
-      this.props.history.push('/login')
-    }
   }
 
   componentDidMount() {
@@ -97,11 +96,11 @@ class Home extends React.Component {
 
   loadShops() {
     if ('geolocation' in navigator) {
+      this.setState({ status: 'getting your location coordinates ...' })
       navigator.geolocation.getCurrentPosition(position => {
         const { latitude, longitude } = position.coords
-        makeRequest(
-          `//localhost:4000/shops?latitude=${latitude}&longitude=${longitude}`
-        )
+        this.setState({ status: 'loading shops' })
+        makeRequest(`/api/shops?latitude=${latitude}&longitude=${longitude}`)
           .then(resp => {
             if (resp.status === 200) return resp.json()
             if (resp.status === 401) this.props.history.push('/login')
@@ -115,7 +114,7 @@ class Home extends React.Component {
                   near,
                   preferred
                 }
-                state.msg = ''
+                state.status = ''
                 state.error = ''
                 return state
               })
@@ -127,13 +126,13 @@ class Home extends React.Component {
           })
       })
     } else {
-      // in a real world app we would fallback to an api
+      // in a real world app we would do fallback
       this.setState({ error: 'could not get your location coordinates' })
     }
   }
 
   likeShopHandler(shop_id) {
-    makeRequest(`//localhost:4000/shop/like/${shop_id}`, { method: 'post' })
+    makeRequest(`/api/shop/like/${shop_id}`, { method: 'post' })
       .then(dt => dt.json())
       .then(resp => {
         if (resp.success) {
@@ -163,7 +162,7 @@ class Home extends React.Component {
   }
 
   unlikeShopHandler(shop_id) {
-    makeRequest(`//localhost:4000/shop/unlike/${shop_id}`, { method: 'post' })
+    makeRequest(`/api/shop/unlike/${shop_id}`, { method: 'post' })
       .then(dt => dt.json())
       .then(resp => {
         if (resp.success) {
@@ -197,7 +196,7 @@ class Home extends React.Component {
   }
 
   dislikeShopHandler(shop_id) {
-    makeRequest(`//localhost:4000/shop/dislike/${shop_id}`, { method: 'post' })
+    makeRequest(`/api/shop/dislike/${shop_id}`, { method: 'post' })
       .then(dt => dt.json())
       .then(resp => {
         if (resp.success) {
@@ -237,7 +236,7 @@ class Home extends React.Component {
   }
 
   render() {
-    const { shops, selectedShops, error } = this.state
+    const { shops, selectedShops, error, status } = this.state
     return (
       <Container>
         <MenuBar>
@@ -255,6 +254,8 @@ class Home extends React.Component {
           </MenuBarItem>
         </MenuBar>
         <ContentWrapper>
+          {!!error && <ErrorMsg>{error}</ErrorMsg>}
+          {!error && !!status && <StatusMsg>{status}</StatusMsg>}
           {shops[selectedShops].map(shop => (
             <ShopItem key={shop.id} shop={shop}>
               {this.renderShopButtons(shop.id)}
