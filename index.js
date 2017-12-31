@@ -4,7 +4,7 @@ const mongoose = require('mongoose')
 const webpack = require('webpack')
 const app = require('./server/config')
 const routes = require('./server/routes/index.routes')
-const config = require('./client/webpack.config.js')
+const config = require('./client/webpack.prod.js')
 
 const compiler = webpack(config)
 compiler.run(function(err, stats) {
