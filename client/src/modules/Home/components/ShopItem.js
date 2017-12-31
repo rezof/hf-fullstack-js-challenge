@@ -5,6 +5,7 @@ import Styled from 'styled-components'
 const Wrapper = Styled.div`
   width: 20%;
   max-width: 250px;
+  height: fit-content;
   display: flex;
   flex-direction: column;
   padding: 0 10px;
@@ -56,7 +57,10 @@ const ShopShape = {
 
 ShopItem.propTypes = {
   shop: PropTypes.shape(ShopShape),
-  children: PropTypes.element || PropTypes.arrayOf(PropTypes.element)
+  children: PropTypes.oneOfType([
+    PropTypes.arrayOf(PropTypes.node),
+    PropTypes.node
+  ])
 }
 
 export default ShopItem
