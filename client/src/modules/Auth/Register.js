@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import Styled from 'styled-components'
 import { Link } from 'react-router-dom'
 import Form from './components/Form'
+import { makeRequest } from '../../utils'
 
 const Container = Styled.div`
   display: flex;
@@ -38,7 +39,7 @@ const ErrorMsg = Styled.span`
   text-align: center;
 `
 
-const AlreadyHaveAccount = Styled(Link)`
+const Goto = Styled(Link)`
   color: grey;
   font-size: 16px;
   text-align: right;
@@ -51,14 +52,17 @@ class Register extends React.Component {
   }
 
   signup(payload) {
-    fetch('//localhost:4000/register', {
-      method: 'post',
-      body: JSON.stringify(payload),
-      headers: {
-        'content-type': 'application/json',
-        Accept: 'application/json'
-      }
-    })
+    makeRequest(
+      '/api/register',
+      {
+        method: 'post',
+        body: JSON.stringify(payload),
+        headers: {
+          'content-type': 'application/json'
+        }
+      },
+      false // disable authorization header
+    )
       .then(rslt => rslt.json())
       .then(data => {
         if (!data.success) {
@@ -133,9 +137,7 @@ class Register extends React.Component {
             submitValue="sign up"
             inputs={this.renderFormInputs()}
           />
-          <AlreadyHaveAccount to="/login">
-            already have a account ?
-          </AlreadyHaveAccount>
+          <Goto to="/login">already have a account ?</Goto>
           {!!errors.length &&
             errors.map((error, i) => <ErrorMsg key={i}>{error}</ErrorMsg>)}
         </ContentWrapper>

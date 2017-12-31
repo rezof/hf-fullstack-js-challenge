@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import Styled from 'styled-components'
 import { Link } from 'react-router-dom'
 import Form from './components/Form'
+import { makeRequest } from '../../utils'
 
 const Container = Styled.div`
   display: flex;
@@ -38,7 +39,7 @@ const ErrorMsg = Styled.span`
   text-align: center;
 `
 
-const CreateAccount = Styled(Link)`
+const Goto = Styled(Link)`
   color: grey;
   font-size: 16px;
   text-align: right;
@@ -51,14 +52,17 @@ class Login extends React.Component {
   }
 
   login(payload) {
-    fetch('//localhost:4000/login', {
-      method: 'post',
-      body: JSON.stringify(payload),
-      headers: {
-        'content-type': 'application/json',
-        Accept: 'application/json'
-      }
-    })
+    makeRequest(
+      '/api/login',
+      {
+        method: 'post',
+        body: JSON.stringify(payload),
+        headers: {
+          'content-type': 'application/json'
+        }
+      },
+      false // disable authorization header
+    )
       .then(rslt => rslt.json())
       .then(data => {
         if (!data.success) {
@@ -117,7 +121,7 @@ class Login extends React.Component {
           />
           {!!errors.length &&
             errors.map((error, i) => <ErrorMsg key={i}>{error}</ErrorMsg>)}
-          <CreateAccount to="/signup">create account ?</CreateAccount>
+          <Goto to="/signup">create account ?</Goto>
         </ContentWrapper>
       </Container>
     )
