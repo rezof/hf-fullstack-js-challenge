@@ -101,7 +101,7 @@ class Login extends React.Component {
       <Input
         innerRef={ref => (this._password = ref)}
         type="password"
-        placeholder="passowrd"
+        placeholder="password"
         required
         minLength="4"
       />

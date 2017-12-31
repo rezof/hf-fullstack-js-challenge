@@ -110,7 +110,7 @@ class Register extends React.Component {
           key="password"
           innerRef={ref => (this._password = ref)}
           type="password"
-          placeholder="passowrd"
+          placeholder="password"
           minLength="4"
           required
         />,
@@ -118,7 +118,7 @@ class Register extends React.Component {
           key="passwordConf"
           innerRef={ref => (this._passwordConf = ref)}
           type="password"
-          placeholder="passowrd confirmation"
+          placeholder="password confirmation"
           minLength="4"
           required
         />
