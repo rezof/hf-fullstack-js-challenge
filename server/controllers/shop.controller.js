@@ -15,11 +15,16 @@ const { distanceBetweenTwoPoints } = require('../utils')
 const sortShopsByDistance = (shops, getDistanceFromUser) => {
   return shops
     .map(shop => {
-      const { _id: id, name, picture, location } = shop
+      const {
+        _id: id,
+        name,
+        picture,
+        location: { coordinates: [longitude, latitude] }
+      } = shop
       // shop coordinates
       const p2 = {
-        latitude: location.coordinates.lat2,
-        longitude: location.coordinates.lon2
+        latitude,
+        longitude
       }
       // distance between shop and user
       const distance = getDistanceFromUser(p2)
