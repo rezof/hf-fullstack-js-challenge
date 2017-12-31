@@ -1,11 +1,20 @@
-const makeRequest = (url, options = { method: 'get' }) => {
-  const token = localStorage.getItem('access_token')
-  const { headers = {} } = options
-  const newHeaders = Object.assign(headers, {
-    Authorization: token,
-    Accept: 'application/json'
-  })
-  return fetch(url, { ...options, headers: newHeaders })
+const makeRequest = (
+  url,
+  options = { method: 'get' },
+  useAuthorization = true
+) => {
+  const token = localStorage.getItem('token')
+  const { headers = {}, ...rest } = options
+  let newHeaders = headers
+  if (useAuthorization) {
+    newHeaders = Object.assign(newHeaders, {
+      Authorization: token,
+      Accept: 'application/json'
+    })
+    console.log('use auth', token)
+  }
+  console.log('newHeaders', newHeaders)
+  return fetch(url, { ...rest, headers: newHeaders })
 }
 
 export { makeRequest }
