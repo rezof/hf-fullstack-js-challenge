@@ -44,6 +44,26 @@ const ShopContainer = Styled.div`
   border: 1px solid black;
 `
 
+const Button = Styled.div`
+color: white;
+font-size: 14px;
+padding: 5px 8px;
+cursor: pointer;
+&:last-of-type{
+  margin-left: 10px;
+}
+`
+
+const LikeBtn = Button.extend`
+  background-color: green;
+`
+
+const DislikeBtn = Button.extend`
+  background-color: red;
+`
+
+const RemoveBtn = DislikeBtn
+
 class Home extends React.Component {
   state = {
     display: 'preferred',
@@ -93,6 +113,23 @@ class Home extends React.Component {
     }
   }
 
+  renderShopButtons(shop_id) {
+    if (this.state.display === 'near') {
+      return [
+        <DislikeBtn onClick={() => this.dislikeShopHandler(shop_id)}>
+          Dislike
+        </DislikeBtn>,
+        <LikeBtn onClick={() => this.likeShopHandler(shop_id)}>Like</LikeBtn>
+      ]
+    } else {
+      return (
+        <RemoveBtn onClick={() => this.unlikeShopHandler(shop_id)}>
+          remove
+        </RemoveBtn>
+      )
+    }
+  }
+
   likeShopHandler(shop_id) {
     makeRequest(`//localhost:4000/shop/like/${shop_id}`, { method: 'post' })
       .then(dt => dt.json())
@@ -114,6 +151,37 @@ class Home extends React.Component {
             state.shops.preferred.push(likedShop)
             state.shops.preferred.sort((a, b) => a.distance > b.distance)
             delete state.shops.near[index]
+            return state
+          })
+        }
+      })
+  }
+
+  unlikeShopHandler(shop_id) {
+    makeRequest(`//localhost:4000/shop/unlike/${shop_id}`, { method: 'post' })
+      .then(dt => dt.json())
+      .then(resp => {
+        if (resp.success) {
+          this.setState(state => {
+            const {
+              preferred,
+              shop: unlikedShop,
+              index
+            } = state.shops.preferred.reduce(
+              (acc, shop, i) => {
+                if (shop.id === shop_id) {
+                  acc['shop'] = shop
+                  acc['index'] = i
+                } else {
+                  acc.near.push(shop)
+                }
+                return acc
+              },
+              { near: [], index: -1 }
+            )
+            state.shops.near.push(unlikedShop)
+            state.shops.near.sort((a, b) => a.distance > b.distance)
+            delete state.shops.preferred[index]
             return state
           })
         }
@@ -155,12 +223,9 @@ class Home extends React.Component {
         </MenuBar>
         <ContentWrapper>
           {shops[display].map(shop => (
-            <ShopItem
-              likeShop={this.likeShopHandler}
-              dislikeShop={this.dislikeShopHandler}
-              key={shop.id}
-              shop={shop}
-            />
+            <ShopItem key={shop.id} shop={shop}>
+              {this.renderShopButtons(shop.id)}
+            </ShopItem>
           ))}
         </ContentWrapper>
       </Container>

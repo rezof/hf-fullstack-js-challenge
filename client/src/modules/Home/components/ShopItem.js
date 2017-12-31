@@ -34,36 +34,15 @@ const ButtonsWrapper = Styled.div`
   padding: 5px 0;
 `
 
-const Button = Styled.div`
-  color: white;
-  font-size: 14px;
-  padding: 5px 8px;
-  cursor: pointer;
-  &:last-of-type{
-    margin-left: 10px;
-  }
-`
-
-const LikeBtn = Button.extend`
-  background-color: green;
-`
-
-const DislikeBtn = Button.extend`
-  background-color: red;
-`
-
 const ShopItem = props => {
-  const { shop: { id, name, picture, distance }, likeShop, dislikeShop } = props
+  const { shop: { id, name, picture, distance }, children } = props
   return (
     <Wrapper>
       <Name>{name}</Name>
       <ImageWrapper>
         <Image src={picture} />
       </ImageWrapper>
-      <ButtonsWrapper>
-        <DislikeBtn onClick={() => dislikeShop(id)}>Dislike</DislikeBtn>
-        <LikeBtn onClick={() => likeShop(id)}>Like</LikeBtn>
-      </ButtonsWrapper>
+      <ButtonsWrapper>{children}</ButtonsWrapper>
     </Wrapper>
   )
 }
@@ -77,8 +56,7 @@ const ShopShape = {
 
 ShopItem.propTypes = {
   shop: PropTypes.shape(ShopShape),
-  likeShop: PropTypes.func.isRequired,
-  dislikeShop: PropTypes.func.isRequired
+  children: PropTypes.element || PropTypes.arrayOf(PropTypes.element)
 }
 
 export default ShopItem

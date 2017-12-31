@@ -79,7 +79,7 @@ const fetchAll = (req, res) => {
     longitude: parseFloat(lon2)
   }
 
-  // curry getDistance with p1 in context
+  // curry distanceBetweenTwoPoints with p1 in context
   const getDistanceFromUser = distanceBetweenTwoPoints(p1)
 
   Promise.all([
@@ -88,8 +88,8 @@ const fetchAll = (req, res) => {
   ])
     .then(dt => {
       const [likedShops = [], dislikedShops = []] = dt
-      const exclude = likedShops.map(shop => shop.id).concat(dislikedShops)
-      ShopModel.all(exclude)
+      const excludedIds = likedShops.map(shop => shop.id).concat(dislikedShops)
+      ShopModel.all(excludedIds)
         .then(shops => {
           const nearShops = sortShopsByDistance(
             shops,
@@ -152,7 +152,7 @@ const unlikeShop = (req, res) => {
   LikeModel.findOneAndRemove(
     {
       user_id,
-      shop_id
+      shop: shop_id
     },
     (err, removed) => {
       if (err) {
@@ -162,8 +162,9 @@ const unlikeShop = (req, res) => {
       } else if (removed) {
         res.json({ success: true })
       } else {
+        console.log(chalk.red('failed to remove like', removed))
         res.statusCode = 400
-        res.success({ success: false })
+        res.json({ success: false })
       }
     }
   )
