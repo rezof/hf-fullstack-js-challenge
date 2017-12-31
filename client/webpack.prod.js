@@ -1,11 +1,16 @@
 const path = require('path')
 const webpack = require('webpack')
-const HtmlWebpackPlugin = require('html-webpack-plugin')
+const htmlWebpackPlugin = require('html-webpack-plugin')
+const cleanWebpackPlugin = require('clean-webpack-plugin')
 const config = require('./webpack.config')
+
+const pathToClean = ['public/*']
+const cleanOptions = { root: path.resolve(__dirname, '../') }
 
 config.output.filename = 'app.[chunkhash].js'
 config.plugins = [
-  new HtmlWebpackPlugin({
+  new cleanWebpackPlugin(pathToClean, cleanOptions),
+  new htmlWebpackPlugin({
     title: 'fullstack js challenge',
     template: './server/views/index.html',
     filename: '../../index.html',
