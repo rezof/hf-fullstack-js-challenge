@@ -22,7 +22,7 @@ app.use(function(req, res, next) {
 })
 
 // set static files route
-app.use('/static', express.static(path.resolve(__dirname, 'public')))
+app.use('/static', express.static(path.resolve(__dirname, '../public')))
 
 // loads env variables into process.env
 require('dotenv').config()
