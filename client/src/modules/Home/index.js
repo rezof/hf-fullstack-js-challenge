@@ -116,14 +116,19 @@ class Home extends React.Component {
   renderShopButtons(shop_id) {
     if (this.state.display === 'near') {
       return [
-        <DislikeBtn onClick={() => this.dislikeShopHandler(shop_id)}>
+        <DislikeBtn
+          key="dislike"
+          onClick={() => this.dislikeShopHandler(shop_id)}
+        >
           Dislike
         </DislikeBtn>,
-        <LikeBtn onClick={() => this.likeShopHandler(shop_id)}>Like</LikeBtn>
+        <LikeBtn key="like" onClick={() => this.likeShopHandler(shop_id)}>
+          Like
+        </LikeBtn>
       ]
     } else {
       return (
-        <RemoveBtn onClick={() => this.unlikeShopHandler(shop_id)}>
+        <RemoveBtn key="remove" onClick={() => this.unlikeShopHandler(shop_id)}>
           remove
         </RemoveBtn>
       )
