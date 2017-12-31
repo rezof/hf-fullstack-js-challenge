@@ -64,9 +64,16 @@ const DislikeBtn = Button.extend`
 
 const RemoveBtn = DislikeBtn
 
+const ErrorMsg = Styled.span`
+  color: red;
+  text-align: center;
+  font-size: 14px;
+`
+
 class Home extends React.Component {
   state = {
-    display: 'preferred',
+    selectedShops: 'near',
+    error: '',
     shops: {
       near: [],
       preferred: []
@@ -77,10 +84,10 @@ class Home extends React.Component {
     this.likeShopHandler = this.likeShopHandler.bind(this)
     this.dislikeShopHandler = this.dislikeShopHandler.bind(this)
     const access_token = localStorage.getItem('access_token')
+
+    // redirect to login
     if (!access_token) {
       this.props.history.push('/login')
-    } else {
-      this.access_token = access_token
     }
   }
 
@@ -95,7 +102,11 @@ class Home extends React.Component {
         makeRequest(
           `//localhost:4000/shops?latitude=${latitude}&longitude=${longitude}`
         )
-          .then(result => result.json())
+          .then(resp => {
+            if (resp.status === 200) return resp.json()
+            if (resp.status === 401) this.props.history.push('/login')
+            else throw new Error('failed to load shops')
+          })
           .then(dt => {
             if (dt && typeof dt.shops === 'object') {
               this.setState(state => {
@@ -104,34 +115,20 @@ class Home extends React.Component {
                   near,
                   preferred
                 }
+                state.msg = ''
+                state.error = ''
                 return state
               })
             }
           })
-          .catch(err => this.setState({ error: 'failed to load shops' }))
+          .catch(err => {
+            console.log('failed to load shops')
+            this.setState({ error: 'failed to load shops' })
+          })
       })
-    }
-  }
-
-  renderShopButtons(shop_id) {
-    if (this.state.display === 'near') {
-      return [
-        <DislikeBtn
-          key="dislike"
-          onClick={() => this.dislikeShopHandler(shop_id)}
-        >
-          Dislike
-        </DislikeBtn>,
-        <LikeBtn key="like" onClick={() => this.likeShopHandler(shop_id)}>
-          Like
-        </LikeBtn>
-      ]
     } else {
-      return (
-        <RemoveBtn key="remove" onClick={() => this.unlikeShopHandler(shop_id)}>
-          remove
-        </RemoveBtn>
-      )
+      // in a real world app we would fallback to an api
+      this.setState({ error: 'could not get your location coordinates' })
     }
   }
 
@@ -159,6 +156,9 @@ class Home extends React.Component {
             return state
           })
         }
+      })
+      .catch(err => {
+        console.log('failed to like shop')
       })
   }
 
@@ -191,6 +191,9 @@ class Home extends React.Component {
           })
         }
       })
+      .catch(err => {
+        console.log('failed to unlike shop')
+      })
   }
 
   dislikeShopHandler(shop_id) {
@@ -206,28 +209,53 @@ class Home extends React.Component {
           })
         }
       })
+      .catch(err => {
+        console.log('failed to dislike shop')
+      })
+  }
+
+  renderShopButtons(shop_id) {
+    if (this.state.selectedShops === 'near') {
+      return [
+        <DislikeBtn
+          key="dislike"
+          onClick={() => this.dislikeShopHandler(shop_id)}
+        >
+          Dislike
+        </DislikeBtn>,
+        <LikeBtn key="like" onClick={() => this.likeShopHandler(shop_id)}>
+          Like
+        </LikeBtn>
+      ]
+    } else {
+      return (
+        <RemoveBtn key="remove" onClick={() => this.unlikeShopHandler(shop_id)}>
+          remove
+        </RemoveBtn>
+      )
+    }
   }
 
   render() {
-    const { shops, display } = this.state
+    const { shops, selectedShops, error } = this.state
     return (
       <Container>
         <MenuBar>
           <MenuBarItem
-            active={display === 'near'}
-            onClick={() => this.setState({ display: 'near' })}
+            active={selectedShops === 'near'}
+            onClick={() => this.setState({ selectedShops: 'near' })}
           >
             Near By Shops
           </MenuBarItem>
           <MenuBarItem
-            onClick={() => this.setState({ display: 'preferred' })}
-            active={display === 'preferred'}
+            onClick={() => this.setState({ selectedShops: 'preferred' })}
+            active={selectedShops === 'preferred'}
           >
             My Preferred Shops
           </MenuBarItem>
         </MenuBar>
         <ContentWrapper>
-          {shops[display].map(shop => (
+          {shops[selectedShops].map(shop => (
             <ShopItem key={shop.id} shop={shop}>
               {this.renderShopButtons(shop.id)}
             </ShopItem>
