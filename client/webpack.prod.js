@@ -10,6 +10,26 @@ config.plugins = [
     template: './server/views/index.html',
     filename: '../../index.html',
     inject: 'body'
+  }),
+  new webpack.DefinePlugin({
+    'process.env': {
+      NODE_ENV: JSON.stringify('production')
+    }
+  }),
+  new webpack.optimize.UglifyJsPlugin({
+    ie8: false,
+    ecma: 5,
+    sourceMap: false,
+    minimize: true,
+    mangle: true,
+    comments: false,
+    compress: {
+      unused: true,
+      dead_code: true
+    },
+    output: {
+      comments: false
+    }
   })
 ]
 

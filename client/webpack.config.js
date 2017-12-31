@@ -4,6 +4,7 @@ module.exports = {
   entry: path.resolve(__dirname, 'index.js'),
   output: {
     path: path.resolve(__dirname, '../public/assets/js/'),
+    publicPath: '/static/assets/js',
     filename: 'app.js'
   },
   module: {
