@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import Styled from 'styled-components'
 
 import ShopItem from './components/ShopItem'
+import { makeRequest } from '../../utils'
 
 const Container = Styled.div`
   display: flex;
@@ -53,6 +54,8 @@ class Home extends React.Component {
   }
 
   componentWillMount() {
+    this.likeShopHandler = this.likeShopHandler.bind(this)
+    this.dislikeShopHandler = this.dislikeShopHandler.bind(this)
     const access_token = localStorage.getItem('access_token')
     if (!access_token) {
       this.props.history.push('/login')
@@ -66,27 +69,59 @@ class Home extends React.Component {
   }
 
   loadShops() {
-    fetch('//localhost:4000/shops', {
-      headers: {
-        Authorization: this.access_token
-      },
-      accept: 'application/json'
-    })
-      .then(result => result.json())
-      .then(dt => {
-        if (dt.hasOwnProperty('shops')) {
-          this.setState(state => {
-            const { shops: { near = [], preferred = [] } } = dt
-            state.shops = {
-              near,
-              preferred
+    if ('geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition(position => {
+        const { latitude, longitude } = position.coords
+        makeRequest(
+          `//localhost:4000/shops?latitude=${latitude}&longitude=${longitude}`
+        )
+          .then(result => result.json())
+          .then(dt => {
+            if (dt && typeof dt.shops === 'object') {
+              this.setState(state => {
+                const { shops: { near = [], preferred = [] } } = dt
+                state.shops = {
+                  near,
+                  preferred
+                }
+                return state
+              })
             }
+          })
+          .catch(err => this.setState({ error: 'failed to load shops' }))
+      })
+    }
+  }
+
+  likeShopHandler(shop_id) {
+    makeRequest(`//localhost:4000/shop/like/${shop_id}`, { method: 'post' })
+      .then(dt => dt.json())
+      .then(resp => {
+        if (resp.success) {
+          this.setState(state => {
+            const { near, shop: likedShop, index } = state.shops.near.reduce(
+              (acc, shop, i) => {
+                if (shop.id === shop_id) {
+                  console.log('i', i)
+                  acc['shop'] = shop
+                  acc['index'] = i
+                } else {
+                  acc.near.push(shop)
+                }
+                return acc
+              },
+              { near: [] }
+            )
+            state.shops.preferred.push(likedShop)
+            state.shops.preferred.sort((a, b) => a.distance > b.distance)
+            delete state.shops.near[index]
             return state
           })
         }
       })
-      .catch(err => this.setState({ error: 'failed to load shops' }))
   }
+
+  dislikeShopHandler(id) {}
 
   render() {
     const { shops, display } = this.state
@@ -107,7 +142,13 @@ class Home extends React.Component {
           </MenuBarItem>
         </MenuBar>
         <ContentWrapper>
-          {shops[display].map(shop => <ShopItem key={shop.id} shop={shop} />)}
+          {shops[display].map(shop => (
+            <ShopItem
+              likeShopHandler={this.likeShopHandler}
+              key={shop.id}
+              shop={shop}
+            />
+          ))}
         </ContentWrapper>
       </Container>
     )

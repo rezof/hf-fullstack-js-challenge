@@ -38,7 +38,8 @@ const Button = Styled.div`
   color: white;
   font-size: 14px;
   padding: 5px 8px;
-  &:last-of-type {
+  cursor: pointer;
+  &:last-of-type{
     margin-left: 10px;
   }
 `
@@ -52,7 +53,7 @@ const DislikeBtn = Button.extend`
 `
 
 const ShopItem = props => {
-  const { shop: { id, name, picture, distance } } = props
+  const { shop: { id, name, picture, distance }, likeShopHandler } = props
   return (
     <Wrapper>
       <Name>{name}</Name>
@@ -61,7 +62,7 @@ const ShopItem = props => {
       </ImageWrapper>
       <ButtonsWrapper>
         <DislikeBtn>Dislike</DislikeBtn>
-        <LikeBtn>Like</LikeBtn>
+        <LikeBtn onClick={() => likeShopHandler(id)}>Like</LikeBtn>
       </ButtonsWrapper>
     </Wrapper>
   )
@@ -75,7 +76,9 @@ const ShopShape = {
 }
 
 ShopItem.propTypes = {
-  shop: PropTypes.shape(ShopShape)
+  shop: PropTypes.shape(ShopShape),
+  likeShop: PropTypes.func.isRequired,
+  dislikeShop: PropTypes.func.isRequired
 }
 
 export default ShopItem
