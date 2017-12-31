@@ -1,6 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import Styled from 'styled-components'
+import { Link } from 'react-router-dom'
+import Form from './components/Form'
 
 const Container = Styled.div`
   display: flex;
@@ -10,7 +12,7 @@ const Container = Styled.div`
   align-items: center;
 `
 
-const FormWrapper = Styled.div`
+const ContentWrapper = Styled.div`
   display: flex;
   flex-direction: column;
   width: 40%;
@@ -19,19 +21,6 @@ const FormWrapper = Styled.div`
   border: 1px solid lightgrey;
   border-radius: 10px;
   box-shadow: 2px 2px 10px #0000002b;
-`
-
-const LoginTitle = Styled.p`
-  color: grey;
-  text-align: center;
-  margin-bottom: 15px;
-  font-size: 24px;
-`
-
-const Form = Styled.form`
-  flex: 1;
-  display: flex;
-  flex-direction: column;
 `
 
 const Input = Styled.input`
@@ -43,24 +32,22 @@ const Input = Styled.input`
   margin-bottom: 8px;
 `
 
-const Submit = Input.extend`
-  background-color: papayawhip;
-  color: black;
-`
-
 const ErrorMsg = Styled.span`
   color: red;
   font-size: 16px;
   text-align: center;
 `
 
+const AlreadyHaveAccount = Styled(Link)`
+  color: grey;
+  font-size: 16px;
+  text-align: right;
+  text-decoration: none;
+`
+
 class Register extends React.Component {
-  constructor() {
-    super()
-    this.state = {
-      errors: []
-    }
-    this.handleFormSubmit = this.handleFormSubmit.bind(this)
+  state = {
+    errors: []
   }
 
   signup(payload) {
@@ -87,54 +74,71 @@ class Register extends React.Component {
       .catch(err => console.error('login failed', err))
   }
 
-  handleFormSubmit(e) {
-    e.preventDefault()
-    const payload = {
-      email: this._email.value,
-      password: this._password.value,
-      passwordConf: this._passwordConf.value
+  formSubmitHandler() {
+    return e => {
+      e.preventDefault()
+      const payload = {
+        email: this._email.value,
+        password: this._password.value,
+        passwordConf: this._passwordConf.value
+      }
+      const errors = []
+      if (payload.password !== payload.passwordConf) {
+        errors.push("passwords don't match")
+      }
+      this.setState({ errors }, state => {
+        if (errors.length === 0) this.signup(payload)
+      })
     }
-    const errors = []
-    if (payload.password !== payload.passwordConf) {
-      errors.push("passwords don't match")
+  }
+
+  renderFormInputs() {
+    return () => {
+      return [
+        <Input
+          key="email"
+          innerRef={ref => (this._email = ref)}
+          type="email"
+          placeholder="email"
+          required
+        />,
+        <Input
+          key="password"
+          innerRef={ref => (this._password = ref)}
+          type="password"
+          placeholder="passowrd"
+          minLength="4"
+          required
+        />,
+        <Input
+          key="passwordConf"
+          innerRef={ref => (this._passwordConf = ref)}
+          type="password"
+          placeholder="passowrd confirmation"
+          minLength="4"
+          required
+        />
+      ]
     }
-    this.setState({ errors }, state => {
-      if (errors.length === 0) this.signup(payload)
-    })
   }
 
   render() {
     const { errors } = this.state
     return (
       <Container>
-        <FormWrapper>
-          <LoginTitle>Register</LoginTitle>
-          <Form onSubmit={this.handleFormSubmit}>
-            <Input
-              innerRef={ref => (this._email = ref)}
-              type="email"
-              placeholder="email"
-              required
-            />
-            <Input
-              innerRef={ref => (this._password = ref)}
-              type="password"
-              placeholder="passowrd"
-              minLength="4"
-              required
-            />
-            <Input
-              innerRef={ref => (this._passwordConf = ref)}
-              type="password"
-              placeholder="passowrd confirmation"
-              minLength="4"
-              required
-            />
-            <Submit type="submit" value="sign up" />
-            {!!errors.length &&
-              errors.map((error, i) => <ErrorMsg key={i}>{error}</ErrorMsg>)}
-          </Form>
-        </FormWrapper>
+        <ContentWrapper>
+          <Form
+            title="Register"
+            submitHandler={this.formSubmitHandler()}
+            submitValue="sign up"
+            inputs={this.renderFormInputs()}
+          />
+          <AlreadyHaveAccount to="/login">
+            already have a account ?
+          </AlreadyHaveAccount>
+          {!!errors.length &&
+            errors.map((error, i) => <ErrorMsg key={i}>{error}</ErrorMsg>)}
+        </ContentWrapper>
       </Container>
     )
   }

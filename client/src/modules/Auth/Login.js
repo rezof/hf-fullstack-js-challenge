@@ -1,6 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import Styled from 'styled-components'
+import { Link } from 'react-router-dom'
+import Form from './components/Form'
 
 const Container = Styled.div`
   display: flex;
@@ -10,7 +12,7 @@ const Container = Styled.div`
   align-items: center;
 `
 
-const FormWrapper = Styled.div`
+const ContentWrapper = Styled.div`
   display: flex;
   flex-direction: column;
   width: 40%;
@@ -19,19 +21,6 @@ const FormWrapper = Styled.div`
   border: 1px solid lightgrey;
   border-radius: 10px;
   box-shadow: 2px 2px 10px #0000002b;
-`
-
-const LoginTitle = Styled.p`
-  color: grey;
-  text-align: center;
-  margin-bottom: 15px;
-  font-size: 24px;
-`
-
-const Form = Styled.form`
-  flex: 1;
-  display: flex;
-  flex-direction: column;
 `
 
 const Input = Styled.input`
@@ -43,24 +32,22 @@ const Input = Styled.input`
   margin-bottom: 8px;
 `
 
-const Submit = Input.extend`
-  background-color: papayawhip;
-  color: black;
-`
-
 const ErrorMsg = Styled.span`
   color: red;
   font-size: 16px;
   text-align: center;
 `
 
+const CreateAccount = Styled(Link)`
+  color: grey;
+  font-size: 16px;
+  text-align: right;
+  text-decoration: none;
+`
+
 class Login extends React.Component {
-  constructor() {
-    super()
-    this.state = {
-      loginErrors: []
-    }
-    this.handleFormSubmit = this.handleFormSubmit.bind(this)
+  state = {
+    errors: []
   }
 
   login(payload) {
@@ -77,53 +64,61 @@ class Login extends React.Component {
         if (!data.success) {
           const { errors = [] } = data
           this.setState(state => {
-            state.loginErrors = errors.length ? errors : ['failed to login']
+            state.errors = errors.length ? errors : ['failed to login']
             return state
           })
         } else {
-          localStorage.setItem('access_token', data.token)
+          localStorage.setItem('token', data.token)
           this.props.history.push('/')
         }
       })
       .catch(err => console.error('login failed', err))
   }
 
-  handleFormSubmit(e) {
-    e.preventDefault()
-    const payload = {
-      email: this._email.value,
-      password: this._password.value
+  formSubmitHandler() {
+    return e => {
+      e.preventDefault()
+      const payload = {
+        email: this._email.value,
+        password: this._password.value
+      }
+      this.setState({ errors: [] }, () => this.login(payload))
     }
-    this.setState({ loginErrors: [] }, () => this.login(payload))
+  }
+
+  renderFormInputs() {
+    return () => [
+      <Input
+        innerRef={ref => (this._email = ref)}
+        type="email"
+        placeholder="email"
+        required
+      />,
+      <Input
+        innerRef={ref => (this._password = ref)}
+        type="password"
+        placeholder="passowrd"
+        required
+        minLength="4"
+      />
+    ]
   }
 
   render() {
-    const { loginErrors } = this.state
+    const { errors } = this.state
     return (
       <Container>
-        <FormWrapper>
-          <LoginTitle>Login</LoginTitle>
-          <Form onSubmit={this.handleFormSubmit}>
-            <Input
-              innerRef={ref => (this._email = ref)}
-              type="email"
-              placeholder="email"
-              required
-            />
-            <Input
-              innerRef={ref => (this._password = ref)}
-              type="password"
-              placeholder="passowrd"
-              required
-              minLength="4"
-            />
-            <Submit type="submit" value="login" />
-            {!!loginErrors.length &&
-              loginErrors.map((error, i) => (
-                <ErrorMsg key={i}>{error}</ErrorMsg>
-              ))}
-          </Form>
-        </FormWrapper>
+        <ContentWrapper>
+          <Form
+            title="Login"
+            submitHandler={this.formSubmitHandler()}
+            submitValue="login"
+            inputs={this.renderFormInputs()}
+          />
+          {!!errors.length &&
+            errors.map((error, i) => <ErrorMsg key={i}>{error}</ErrorMsg>)}
+          <CreateAccount to="/signup">create account ?</CreateAccount>
+        </ContentWrapper>
       </Container>
     )
   }
