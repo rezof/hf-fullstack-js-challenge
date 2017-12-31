@@ -53,7 +53,7 @@ const DislikeBtn = Button.extend`
 `
 
 const ShopItem = props => {
-  const { shop: { id, name, picture, distance }, likeShopHandler } = props
+  const { shop: { id, name, picture, distance }, likeShop, dislikeShop } = props
   return (
     <Wrapper>
       <Name>{name}</Name>
@@ -61,8 +61,8 @@ const ShopItem = props => {
         <Image src={picture} />
       </ImageWrapper>
       <ButtonsWrapper>
-        <DislikeBtn>Dislike</DislikeBtn>
-        <LikeBtn onClick={() => likeShopHandler(id)}>Like</LikeBtn>
+        <DislikeBtn onClick={() => dislikeShop(id)}>Dislike</DislikeBtn>
+        <LikeBtn onClick={() => likeShop(id)}>Like</LikeBtn>
       </ButtonsWrapper>
     </Wrapper>
   )

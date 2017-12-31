@@ -102,7 +102,6 @@ class Home extends React.Component {
             const { near, shop: likedShop, index } = state.shops.near.reduce(
               (acc, shop, i) => {
                 if (shop.id === shop_id) {
-                  console.log('i', i)
                   acc['shop'] = shop
                   acc['index'] = i
                 } else {
@@ -110,7 +109,7 @@ class Home extends React.Component {
                 }
                 return acc
               },
-              { near: [] }
+              { near: [], index: -1 }
             )
             state.shops.preferred.push(likedShop)
             state.shops.preferred.sort((a, b) => a.distance > b.distance)
@@ -121,7 +120,20 @@ class Home extends React.Component {
       })
   }
 
-  dislikeShopHandler(id) {}
+  dislikeShopHandler(shop_id) {
+    makeRequest(`//localhost:4000/shop/dislike/${shop_id}`, { method: 'post' })
+      .then(dt => dt.json())
+      .then(resp => {
+        if (resp.success) {
+          this.setState(state => {
+            state.shops.near = state.shops.near.filter(
+              shop => shop.id !== shop_id
+            )
+            return state
+          })
+        }
+      })
+  }
 
   render() {
     const { shops, display } = this.state
@@ -144,7 +156,8 @@ class Home extends React.Component {
         <ContentWrapper>
           {shops[display].map(shop => (
             <ShopItem
-              likeShopHandler={this.likeShopHandler}
+              likeShop={this.likeShopHandler}
+              dislikeShop={this.dislikeShopHandler}
               key={shop.id}
               shop={shop}
             />
