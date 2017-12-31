@@ -9,8 +9,8 @@ router.get('/', (req, res) => {
   res.sendFile(path.resolve(__dirname, '../../public/index.html'))
 })
 
-router.use('/', authRoutes)
-router.use('/', shopRoutes)
+router.use('/api', authRoutes)
+router.use('/api', shopRoutes)
 
 router.get('*', (req, res) => {
   res.sendFile(path.resolve(__dirname, '../../public/index.html'))
