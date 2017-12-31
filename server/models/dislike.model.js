@@ -20,7 +20,7 @@ DislikeModel.statics = {
 
 // set document ttl (expiration)
 DislikeModel.plugin(ttl, {
-  ttl: 10000 // 2 hours
+  ttl: 7200000 // 2 hours
 })
 
 module.exports = mongoose.model('dislikes', DislikeModel)
