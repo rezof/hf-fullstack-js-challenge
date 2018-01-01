@@ -11,7 +11,6 @@ config.output.filename = 'app.[chunkhash].js'
 config.plugins = [
   new cleanWebpackPlugin(pathToClean, cleanOptions),
   new htmlWebpackPlugin({
-    title: 'fullstack js challenge',
     template: './server/views/index.html',
     filename: '../../index.html',
     inject: 'body'
