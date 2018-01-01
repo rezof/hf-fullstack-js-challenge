@@ -2,9 +2,9 @@
   "name": "hf-fullstack-js-challenge",
   "version": "1.0.0",
   "main": "index.js",
-  "license": "MIT",
   "scripts":{
-    "install": "npm install"
+    "build": "npm install; node_modules/.bin/webpack --config client/webpack.prod.js",
+    "start": "node index.js"
   },
   "dependencies": {
     "babel-preset-react": "^6.24.1",
