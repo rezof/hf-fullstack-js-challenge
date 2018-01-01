@@ -2,7 +2,7 @@
   "name": "hf-fullstack-js-challenge",
   "version": "1.0.0",
   "main": "index.js",
-  "scripts":{
+  "scripts": {
     "build": "npm install; node_modules/.bin/webpack --config client/webpack.prod.js",
     "start": "node index.js",
     "build:db": "mongorestore --db shops db/shops/"
@@ -20,11 +20,12 @@
     "jsonwebtoken": "^8.1.0",
     "mongoose": "^5.0.0-rc0",
     "mongoose-ttl": "^0.0.3",
-    "webpack": "3.9.0",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
+    "react-notification-system": "^0.2.16",
     "react-router-dom": "^4.2.2",
-    "styled-components": "^2.4.0"
+    "styled-components": "^2.4.0",
+    "webpack": "3.9.0"
   },
   "devDependencies": {
     "babel-core": "^6.26.0",
