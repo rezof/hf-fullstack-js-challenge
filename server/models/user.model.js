@@ -29,7 +29,6 @@ UserSchema.statics = {
     return this.findOne({ _id, email })
       .exec()
       .then(user => {
-        console.log('user', user)
         return user
       })
       .catch(err => {
