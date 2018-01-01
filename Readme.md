@@ -5,7 +5,7 @@
 - mongodb ^3.x
 
 
-## Usage only
+## Usage
 
 1. Clone this repository
     ```
@@ -17,8 +17,13 @@
     ```
       $ [npm|yarn] install
     ```
-    
-3. Rename config file and then edit the file. (`.env.example` to `.env`)
+
+3. build database
+    ```
+    $ [npm|yarn] run build:db
+    ```
+
+4. Rename config file and then edit the file. (`.env.example` to `.env`)
     ```
     PORT=4000
     MONGO_DB_URI='mongodb://localhost/shops'
@@ -26,7 +31,7 @@
     JWT_LIFESPAN=10368000
     ```
 
-4. Start server
+5. Start server
     ```
       $ [npm|yarn] start
     ```
