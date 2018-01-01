@@ -21,24 +21,34 @@ const generateToken = user => {
  */
 const register = (req, res) => {
   const { email, password } = req.body
-  UserModel.create(
-    {
-      email,
-      password
-    },
-    (err, user) => {
-      if (err) {
-        console.log(chalk.red('register error:', err))
-        res.statusCode = 500
-        res.json({ success: false, errors: ['failed to create user'] })
+  UserModel.checkEmail(email)
+    .then(user => {
+      if (!user) {
+        UserModel.create(
+          {
+            email,
+            password
+          },
+          (err, user) => {
+            if (err) {
+              console.log(chalk.red('register error:', err))
+              throw new Error('failed to create user') // let catch handler response
+            } else {
+              const { email, _id: id } = user
+              const token = generateToken({ email, id })
+              res.json({ success: true, token })
+            }
+          }
+        )
       } else {
-        console.log('user', user)
-        const { email, _id: id } = user
-        const token = generateToken({ email, id })
-        res.json({ success: true, token })
+        res.statusCode = 409
+        res.json({ success: false, errors: ['email already exists'] })
       }
-    }
-  )
+    })
+    .catch(() => {
+      res.statusCode = 500
+      res.json({ success: false, errors: ['failed to create user'] })
+    })
 }
 
 const login = (req, res) => {

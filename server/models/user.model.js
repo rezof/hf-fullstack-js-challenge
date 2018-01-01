@@ -25,6 +25,9 @@ UserSchema.pre('save', function(next) {
 })
 
 UserSchema.statics = {
+  checkEmail(email) {
+    return this.findOne({ email }).exec()
+  },
   verify(_id, email) {
     return this.findOne({ _id, email })
       .exec()
@@ -32,7 +35,7 @@ UserSchema.statics = {
         return user
       })
       .catch(err => {
-        console.log(chalk.red('failed to veirfy user', err))
+        console.log(chalk.red('failed to verify user', err))
         return err
       })
   },
