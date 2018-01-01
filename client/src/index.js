@@ -5,8 +5,13 @@ import {
   Link,
   Redirect
 } from 'react-router-dom'
+import Styled from 'styled-components'
 import Home from './modules/Home'
 import { Login, Register } from './modules/Auth'
+
+const RoutesWrapper = Styled.div`
+  height: 100vh;
+`
 
 // if token is set return home component
 // if not redirect to /login
@@ -28,11 +33,11 @@ const PrivateRoute = ({ component: Component, ...rest }) => {
 export default () => {
   return (
     <Router>
-      <div>
+      <RoutesWrapper>
         <PrivateRoute exact path="/" component={Home} />
         <Route path="/login" component={Login} />
         <Route path="/signup" component={Register} />
-      </div>
+      </RoutesWrapper>
     </Router>
   )
 }
