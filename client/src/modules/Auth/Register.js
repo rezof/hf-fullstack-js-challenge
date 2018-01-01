@@ -66,14 +66,16 @@ class Register extends React.Component {
     )
       .then(rslt => rslt.json())
       .then(data => {
-        if (!data.success) {
+        if (data.success) {
+          const token = data.token
+          localStorage.setItem('token', token)
+          this.props.history.push('/')
+        } else {
           const { errors = [] } = data
           this.setState(state => {
             state.errors = errors.length ? errors : ['failed to login']
             return state
           })
-        } else {
-          this.props.history.push('/login')
         }
       })
       .catch(err => console.error('login failed', err))
