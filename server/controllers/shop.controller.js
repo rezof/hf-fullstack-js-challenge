@@ -1,9 +1,54 @@
 const chalk = require('chalk')
+const jwt = require('jsonwebtoken')
+
 const ShopModel = require('../models/shop.model')
 const LikeModel = require('../models/like.model')
 const DislikeModel = require('../models/dislike.model')
+const UserModel = require('../models/user.model')
 
 const { distanceBetweenTwoPoints } = require('../utils')
+
+/**
+ * verify user
+ * @param token
+ *
+ * @return {*}
+ */
+const verifyAuth = (req, res, next) => {
+  var token =
+    req.body.token ||
+    req.query.token ||
+    req.headers['authorization'] ||
+    req.headers['x-access-token']
+  if (token) {
+    jwt.verify(token, process.env.JWT_SECRET, function(err, decoded) {
+      if (err) {
+        console.log(chalk.red('token not valid', err))
+        res.statusCode = 401
+        res.json({ errors: ['token not valid'] })
+      } else {
+        const { id = '', email = '' } = decoded
+        UserModel.verify(id, email)
+          .then(user => {
+            if (user) {
+              req.user = user
+              next()
+            } else {
+              res.statusCode = 401
+              res.json({ errors: ['user not found'] })
+            }
+          })
+          .catch(err => {
+            console.log(chalk.red('failed to verify user', err))
+            res.statusCode = 500
+          })
+      }
+    })
+  } else {
+    res.statusCode = 401
+    res.json({ errors: ['authentification required!'] })
+  }
+}
 
 /**
  * calculates distance and returns an ordered shops list
@@ -199,6 +244,7 @@ const dislikeShop = (req, res) => {
 }
 
 module.exports = {
+  verifyAuth,
   fetchAll,
   likeShop,
   dislikeShop,
