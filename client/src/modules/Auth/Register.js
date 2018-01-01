@@ -52,15 +52,16 @@ class Register extends React.Component {
   }
 
   signup(payload) {
+    const requestOptions = {
+      method: 'post',
+      body: JSON.stringify(payload),
+      headers: {
+        'content-type': 'application/json'
+      }
+    }
     makeRequest(
       '/api/register',
-      {
-        method: 'post',
-        body: JSON.stringify(payload),
-        headers: {
-          'content-type': 'application/json'
-        }
-      },
+      requestOptions,
       false // disable authorization header
     )
       .then(rslt => rslt.json())

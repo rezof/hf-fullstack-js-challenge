@@ -6,6 +6,7 @@ const makeRequest = (
   const token = localStorage.getItem('token')
   const { headers = {}, ...rest } = options
   let newHeaders = headers
+  // append Authorization header to headers
   if (useAuthorization) {
     newHeaders = Object.assign(newHeaders, {
       Authorization: token,

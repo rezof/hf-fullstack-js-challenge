@@ -52,15 +52,16 @@ class Login extends React.Component {
   }
 
   login(payload) {
+    const requestOptions = {
+      method: 'post',
+      body: JSON.stringify(payload),
+      headers: {
+        'content-type': 'application/json'
+      }
+    }
     makeRequest(
       '/api/login',
-      {
-        method: 'post',
-        body: JSON.stringify(payload),
-        headers: {
-          'content-type': 'application/json'
-        }
-      },
+      requestOptions,
       false // disable authorization header
     )
       .then(rslt => rslt.json())
@@ -80,6 +81,7 @@ class Login extends React.Component {
   }
 
   formSubmitHandler() {
+    // return a function bound to this
     return e => {
       e.preventDefault()
       const payload = {
@@ -91,6 +93,7 @@ class Login extends React.Component {
   }
 
   renderFormInputs() {
+    // return a function bound to this
     return () => [
       <Input
         innerRef={ref => (this._email = ref)}

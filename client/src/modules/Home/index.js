@@ -137,23 +137,27 @@ class Home extends React.Component {
       .then(resp => {
         if (resp.success) {
           this.setState(state => {
-            const { near, shop: likedShop, index } = state.shops.near.reduce(
+            const result = state.shops.near.reduce(
               (acc, shop, i) => {
                 if (shop.id === shop_id) {
-                  acc['shop'] = shop
+                  acc['likedShop'] = shop
                   acc['index'] = i
                 } else {
-                  acc.near.push(shop)
+                  acc.nearShops.push(shop)
                 }
                 return acc
               },
-              { near: [], index: -1 }
+              { nearShops: [], index: -1 }
             )
+            const { nearShops, likedShop, index } = result
+            // removed liked shop
+            state.shops.near = nearShops
+            // add liked shop to preferred shops
             state.shops.preferred.push(likedShop)
+            // re-sort preferred shops
             state.shops.preferred = state.shops.preferred.sort(
               (a, b) => a.distance - b.distance
             )
-            state.shops.near.splice(index, 1)
             return state
           })
         }
@@ -169,27 +173,28 @@ class Home extends React.Component {
       .then(resp => {
         if (resp.success) {
           this.setState(state => {
-            const {
-              preferred,
-              shop: unlikedShop,
-              index
-            } = state.shops.preferred.reduce(
+            const result = state.shops.preferred.reduce(
               (acc, shop, i) => {
                 if (shop.id === shop_id) {
-                  acc['shop'] = shop
+                  acc['unlikedShop'] = shop
                   acc['index'] = i
                 } else {
-                  acc.near.push(shop)
+                  acc.preferredShops.push(shop)
                 }
                 return acc
               },
-              { near: [], index: -1 }
+              { preferred: [], index: -1 }
             )
+            const { preferred, unlikedShop, index } = result
+
+            // removed unliked shop
+            state.shops.preferred = preferred
+            // add unliked shop to near shops
             state.shops.near.push(unlikedShop)
+            // re-sort near shops
             state.shops.near = state.shops.near.sort(
               (a, b) => a.distance - b.distance
             )
-            state.shops.preferred.splice(index, 1)
             return state
           })
         }
@@ -205,6 +210,7 @@ class Home extends React.Component {
       .then(resp => {
         if (resp.success) {
           this.setState(state => {
+            // filter out the disliked shop
             state.shops.near = state.shops.near.filter(
               shop => shop.id !== shop_id
             )

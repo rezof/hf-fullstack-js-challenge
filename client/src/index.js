@@ -8,6 +8,8 @@ import {
 import Home from './modules/Home'
 import { Login, Register } from './modules/Auth'
 
+// if token is set return home component
+// if not redirect to /login
 const PrivateRoute = ({ component: Component, ...rest }) => {
   return (
     <Route
