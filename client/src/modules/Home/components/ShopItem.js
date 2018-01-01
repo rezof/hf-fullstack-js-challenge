@@ -2,6 +2,8 @@ import * as React from 'react'
 import PropTypes from 'prop-types'
 import Styled from 'styled-components'
 
+import ShopItemButtons from './ShopItemButtons'
+
 const Wrapper = Styled.div`
   width: 20%;
   max-width: 250px;
@@ -37,14 +39,24 @@ const ButtonsWrapper = Styled.div`
 `
 
 const ShopItem = props => {
-  const { shop: { id, name, picture, distance }, children } = props
+  const {
+    shop: { id, name, picture, distance },
+    selectedShops,
+    actionsHandlers
+  } = props
   return (
     <Wrapper>
       <Name>{name}</Name>
       <ImageWrapper>
         <Image src={picture} />
       </ImageWrapper>
-      <ButtonsWrapper>{children}</ButtonsWrapper>
+      <ButtonsWrapper>
+        <ShopItemButtons
+          shop_id={id}
+          selectedShops={selectedShops}
+          actionsHandlers={actionsHandlers}
+        />
+      </ButtonsWrapper>
     </Wrapper>
   )
 }
@@ -58,10 +70,8 @@ const ShopShape = {
 
 ShopItem.propTypes = {
   shop: PropTypes.shape(ShopShape),
-  children: PropTypes.oneOfType([
-    PropTypes.arrayOf(PropTypes.node),
-    PropTypes.node
-  ])
+  selectedShops: PropTypes.string.isRequired,
+  actionsHandlers: PropTypes.object.isRequired
 }
 
 export default ShopItem

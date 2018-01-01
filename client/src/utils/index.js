@@ -16,4 +16,10 @@ const makeRequest = (
   return fetch(url, { ...rest, headers: newHeaders })
 }
 
-export { makeRequest }
+const getCurrentPosition = (success, error, options) => {
+  navigator.geolocation.getCurrentPosition(success, error, {
+    maximumAge: Infinity // cached value age
+  })
+}
+
+export { makeRequest, getCurrentPosition }

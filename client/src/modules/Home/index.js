@@ -1,9 +1,10 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import Styled from 'styled-components'
+import NotificationSystem from 'react-notification-system'
 
 import { ShopItem, MenuBar } from './components'
-import { makeRequest } from '../../utils'
+import { makeRequest, getCurrentPosition } from '../../utils'
 
 const Container = Styled.div`
   display: flex;
@@ -25,59 +26,29 @@ const ShopContainer = Styled.div`
   border: 1px solid black;
 `
 
-const Button = Styled.div`
-color: white;
-font-size: 14px;
-padding: 5px 8px;
-cursor: pointer;
-&:last-of-type{
-  margin-left: 10px;
-}
-`
-
-const LikeBtn = Button.extend`
-  background-color: green;
-`
-
-const DislikeBtn = Button.extend`
-  background-color: red;
-`
-
-const RemoveBtn = DislikeBtn
-
-const ErrorMsg = Styled.span`
-  color: red;
-  text-align: center;
-  font-size: 14px;
-`
-
-const StatusMsg = ErrorMsg.extend`
-  color: black;
-`
-
 class Home extends React.Component {
   state = {
     selectedShops: 'near',
-    error: '',
-    status: '',
     shops: {
       near: [],
       preferred: []
     }
   }
 
-  componentWillMount() {
-    this.likeShopHandler = this.likeShopHandler.bind(this)
-    this.dislikeShopHandler = this.dislikeShopHandler.bind(this)
-  }
-
   componentDidMount() {
     this.loadShops()
   }
 
+  displayNotification({ message, level }) {
+    this.refs.notificationSystem.addNotification({
+      message,
+      level,
+      position: 'br'
+    })
+  }
+
   positionSuccess(position) {
     const { latitude, longitude } = position.coords
-    this.setState({ status: 'loading shops' })
     makeRequest(`/api/shops?latitude=${latitude}&longitude=${longitude}`)
       .then(resp => {
         if (resp.status === 200) return resp.json()
@@ -92,36 +63,41 @@ class Home extends React.Component {
               near,
               preferred
             }
-            state.status = ''
-            state.error = ''
             return state
           })
         }
       })
       .catch(err => {
-        console.log('failed to load shops')
-        this.setState({ error: 'failed to load shops' })
+        this.displayNotification({
+          message: 'failed to load shops',
+          level: 'error'
+        })
       })
   }
 
   positionError() {
-    this.setState({ error: 'could not get your location coordinates' })
+    this.displayNotification({
+      message: 'could not get your location coordinates',
+      level: 'error'
+    })
   }
 
   loadShops() {
     if ('geolocation' in navigator) {
-      this.setState({ status: 'getting your location coordinates ...' })
-      navigator.geolocation.getCurrentPosition(
-        // success callback
-        position => this.positionSuccess(position),
-        // error callback
-        () => this.positionError(),
-        // options
-        { maximumAge: Infinity } // cached value age
+      this.displayNotification({
+        message: 'getting your location coordinates ...',
+        level: 'info'
+      })
+      getCurrentPosition(
+        position => this.positionSuccess(position), // success callback
+        this.positionError // error callback
       )
     } else {
       // in a real world app we would do fallback
-      this.setState({ error: 'could not get your location coordinates' })
+      this.displayNotification({
+        message: 'could not get your location coordinates',
+        level: 'error'
+      })
     }
   }
 
@@ -130,34 +106,46 @@ class Home extends React.Component {
       .then(dt => dt.json())
       .then(resp => {
         if (resp.success) {
-          this.setState(state => {
-            const result = state.shops.near.reduce(
-              (acc, shop, i) => {
-                if (shop.id === shop_id) {
-                  acc['likedShop'] = shop
-                  acc['index'] = i
-                } else {
-                  acc.nearShops.push(shop)
-                }
-                return acc
-              },
-              { nearShops: [], index: -1 }
-            )
-            const { nearShops, likedShop, index } = result
-            // removed liked shop
-            state.shops.near = nearShops
-            // add liked shop to preferred shops
-            state.shops.preferred.push(likedShop)
-            // re-sort preferred shops
-            state.shops.preferred = state.shops.preferred.sort(
-              (a, b) => a.distance - b.distance
-            )
-            return state
-          })
+          this.setState(
+            state => {
+              const result = state.shops.near.reduce(
+                (acc, shop, i) => {
+                  if (shop.id === shop_id) {
+                    acc['likedShop'] = shop
+                    acc['index'] = i
+                  } else {
+                    acc.nearShops.push(shop)
+                  }
+                  return acc
+                },
+                { nearShops: [], index: -1 }
+              )
+              const { nearShops, likedShop, index } = result
+
+              // near shops left
+              state.shops.near = nearShops
+              // add liked shop to preferred shops
+              state.shops.preferred.push(likedShop)
+              // re-sort preferred shops
+              state.shops.preferred = state.shops.preferred.sort(
+                (a, b) => a.distance - b.distance
+              )
+              return state
+            },
+            () => {
+              this.displayNotification({
+                message: 'shop liked',
+                level: 'success'
+              })
+            }
+          )
         }
       })
       .catch(err => {
-        console.log('failed to like shop')
+        this.displayNotification({
+          message: 'failed to like the shop',
+          level: 'error'
+        })
       })
   }
 
@@ -166,35 +154,46 @@ class Home extends React.Component {
       .then(dt => dt.json())
       .then(resp => {
         if (resp.success) {
-          this.setState(state => {
-            const result = state.shops.preferred.reduce(
-              (acc, shop, i) => {
-                if (shop.id === shop_id) {
-                  acc['unlikedShop'] = shop
-                  acc['index'] = i
-                } else {
-                  acc.preferredShops.push(shop)
-                }
-                return acc
-              },
-              { preferredShops: [], index: -1 }
-            )
-            const { preferredShops, unlikedShop, index } = result
+          this.setState(
+            state => {
+              const result = state.shops.preferred.reduce(
+                (acc, shop, i) => {
+                  if (shop.id === shop_id) {
+                    acc['unlikedShop'] = shop
+                    acc['index'] = i
+                  } else {
+                    acc.preferredShops.push(shop)
+                  }
+                  return acc
+                },
+                { preferredShops: [], index: -1 }
+              )
+              const { preferredShops, unlikedShop, index } = result
 
-            // removed unliked shop
-            state.shops.preferred = preferredShops
-            // add unliked shop to near shops
-            state.shops.near.push(unlikedShop)
-            // re-sort near shops
-            state.shops.near = state.shops.near.sort(
-              (a, b) => a.distance - b.distance
-            )
-            return state
-          })
+              // preferred shops left
+              state.shops.preferred = preferredShops
+              // add unliked shop to near shops
+              state.shops.near.push(unlikedShop)
+              // re-sort near shops
+              state.shops.near = state.shops.near.sort(
+                (a, b) => a.distance - b.distance
+              )
+              return state
+            },
+            () => {
+              this.displayNotification({
+                message: 'shop removed',
+                level: 'success'
+              })
+            }
+          )
         }
       })
       .catch(err => {
-        console.log('failed to unlike shop')
+        this.displayNotification({
+          message: 'failed to remove the shop',
+          level: 'error'
+        })
       })
   }
 
@@ -203,44 +202,38 @@ class Home extends React.Component {
       .then(dt => dt.json())
       .then(resp => {
         if (resp.success) {
-          this.setState(state => {
-            // filter out the disliked shop
-            state.shops.near = state.shops.near.filter(
-              shop => shop.id !== shop_id
-            )
-            return state
-          })
+          this.setState(
+            state => {
+              // filter out the disliked shop
+              state.shops.near = state.shops.near.filter(
+                shop => shop.id !== shop_id
+              )
+              return state
+            },
+            () => {
+              this.displayNotification({
+                message: 'shop disliked',
+                level: 'success'
+              })
+            }
+          )
         }
       })
       .catch(err => {
-        console.log('failed to dislike shop')
+        this.displayNotification({
+          message: 'failed to dislike the shop',
+          level: 'error'
+        })
       })
-  }
-
-  renderShopButtons(shop_id) {
-    if (this.state.selectedShops === 'near') {
-      return [
-        <DislikeBtn
-          key="dislike"
-          onClick={() => this.dislikeShopHandler(shop_id)}
-        >
-          Dislike
-        </DislikeBtn>,
-        <LikeBtn key="like" onClick={() => this.likeShopHandler(shop_id)}>
-          Like
-        </LikeBtn>
-      ]
-    } else {
-      return (
-        <RemoveBtn key="remove" onClick={() => this.unlikeShopHandler(shop_id)}>
-          remove
-        </RemoveBtn>
-      )
-    }
   }
 
   render() {
     const { shops, selectedShops, error, status } = this.state
+    const actionsHandlers = {
+      dislikeShop: this.dislikeShopHandler.bind(this),
+      unlikeShop: this.unlikeShopHandler.bind(this),
+      likeShop: this.likeShopHandler.bind(this)
+    }
     return (
       <Container>
         <MenuBar
@@ -250,14 +243,16 @@ class Home extends React.Component {
           }
         />
         <ContentWrapper>
-          {!!error && <ErrorMsg>{error}</ErrorMsg>}
-          {!error && !!status && <StatusMsg>{status}</StatusMsg>}
           {shops[selectedShops].map(shop => (
-            <ShopItem key={shop.id} shop={shop}>
-              {this.renderShopButtons(shop.id)}
-            </ShopItem>
+            <ShopItem
+              key={shop.id}
+              shop={shop}
+              selectedShops={selectedShops}
+              actionsHandlers={actionsHandlers}
+            />
           ))}
         </ContentWrapper>
+        <NotificationSystem ref="notificationSystem" />
       </Container>
     )
   }
