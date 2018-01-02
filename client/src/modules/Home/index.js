@@ -228,7 +228,7 @@ class Home extends React.Component {
   }
 
   render() {
-    const { shops, selectedShops, error, status } = this.state
+    const { shops, selectedShops } = this.state
     const actionsHandlers = {
       dislikeShop: this.dislikeShopHandler.bind(this),
       unlikeShop: this.unlikeShopHandler.bind(this),
