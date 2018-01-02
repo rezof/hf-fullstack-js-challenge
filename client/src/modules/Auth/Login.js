@@ -51,6 +51,10 @@ class Login extends React.Component {
     errors: []
   }
 
+  componentWillMount() {
+    localStorage.setItem('token', '')
+  }
+
   login(payload) {
     const requestOptions = {
       method: 'post',
