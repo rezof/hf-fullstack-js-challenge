@@ -15,7 +15,7 @@ const { distanceBetweenTwoPoints } = require('../utils')
  * @return {*}
  */
 const verifyAuth = (req, res, next) => {
-  var token =
+  const token =
     req.body.token ||
     req.query.token ||
     req.headers['authorization'] ||
@@ -41,6 +41,7 @@ const verifyAuth = (req, res, next) => {
           .catch(err => {
             console.log(chalk.red('failed to verify user', err))
             res.statusCode = 500
+            res.end()
           })
       }
     })
@@ -83,7 +84,7 @@ const sortShopsByDistance = (shops, getDistanceFromUser) => {
  * @param user_id
  * return promise
  */
-const getUserDislikedShops = user_id => {
+const getUserDislikedShopsId = user_id => {
   return DislikeModel.findByUser(user_id)
     .then(dislikes => dislikes.map(dislike => dislike.shop_id))
     .catch(err => {
@@ -129,7 +130,7 @@ const fetchAll = (req, res) => {
 
   Promise.all([
     getUserLikedShops(user_id, getDistanceFromUser),
-    getUserDislikedShops(user_id)
+    getUserDislikedShopsId(user_id)
   ])
     .then(dt => {
       const [likedShops = [], dislikedShops = []] = dt
@@ -146,13 +147,13 @@ const fetchAll = (req, res) => {
         .catch(err => {
           console.log(chalk.red('failed to fetch shops', err))
           rez.statusCode = 500
-          res.json({})
+          res.end()
         })
     })
     .catch(err => {
       console.log(chalk.red('failed to fetch liked/disliked shop', err))
       rez.statusCode = 500
-      res.json({})
+      res.end()
     })
 }
 
