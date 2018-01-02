@@ -237,6 +237,7 @@ class Home extends React.Component {
     return (
       <Container>
         <MenuBar
+          history={this.props.history}
           selectedShops={selectedShops}
           changeSelected={selected =>
             this.setState({ selectedShops: selected })

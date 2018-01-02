@@ -37,6 +37,13 @@ export default () => {
         <PrivateRoute exact path="/" component={Home} />
         <Route path="/login" component={Login} />
         <Route path="/signup" component={Register} />
+        <Route
+          path="/logout"
+          component={() => {
+            localStorage.setItem('token', '')
+            return <Redirect to="/login" />
+          }}
+        />
       </RoutesWrapper>
     </Router>
   )
