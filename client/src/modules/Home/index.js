@@ -109,18 +109,21 @@ class Home extends React.Component {
           this.setState(
             state => {
               const result = state.shops.near.reduce(
-                (acc, shop, i) => {
+                /*
+                  data: the accumulated object
+                  shop: the currently iterated shop
+                */
+                (data, shop) => {
                   if (shop.id === shop_id) {
-                    acc['likedShop'] = shop
-                    acc['index'] = i
+                    data['likedShop'] = shop
                   } else {
-                    acc.nearShops.push(shop)
+                    data.nearShops.push(shop)
                   }
-                  return acc
+                  return data
                 },
-                { nearShops: [], index: -1 }
+                { nearShops: [], likedShop: {} } // initial data value
               )
-              const { nearShops, likedShop, index } = result
+              const { nearShops, likedShop } = result
 
               // near shops left
               state.shops.near = nearShops
@@ -157,16 +160,19 @@ class Home extends React.Component {
           this.setState(
             state => {
               const result = state.shops.preferred.reduce(
-                (acc, shop, i) => {
+                /*
+                  data: the accumulated object
+                  shop: the currently iterated shop
+                */
+                (data, shop) => {
                   if (shop.id === shop_id) {
-                    acc['unlikedShop'] = shop
-                    acc['index'] = i
+                    data['unlikedShop'] = shop
                   } else {
-                    acc.preferredShops.push(shop)
+                    data.preferredShops.push(shop)
                   }
-                  return acc
+                  return data
                 },
-                { preferredShops: [], index: -1 }
+                { preferredShops: [], unlikedShop: {} } // initial data value
               )
               const { preferredShops, unlikedShop, index } = result
 
