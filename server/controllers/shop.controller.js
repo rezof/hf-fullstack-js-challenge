@@ -89,7 +89,7 @@ const getUserDislikedShopsId = user_id => {
     .then(dislikes => dislikes.map(dislike => dislike.shop_id))
     .catch(err => {
       console.log(chalk.red('failed to load user liked shops', err))
-      return err
+      throw err
     })
 }
 
@@ -100,10 +100,13 @@ const getUserDislikedShopsId = user_id => {
  */
 const getUserLikedShops = (user_id, getDistanceFromUser) => {
   return LikeModel.findByUser(user_id)
-    .then(shops => sortShopsByDistance(shops, getDistanceFromUser))
+    .then(shops => {
+      throw new Error('hi')
+      // sortShopsByDistance(shops, getDistanceFromUser)
+    })
     .catch(err => {
       console.log(chalk.red('failed to load user liked shops', err))
-      return err
+      throw err
     })
 }
 
@@ -115,7 +118,7 @@ const getUserLikedShops = (user_id, getDistanceFromUser) => {
  *
  * @return {*}
  * **/
-const fetchAll = (req, res) => {
+const fetchAll = async (req, res) => {
   const { latitude: lat1, longitude: lon2 } = req.query
   const { user: { id: user_id } } = req
 
@@ -127,34 +130,28 @@ const fetchAll = (req, res) => {
 
   // curry distanceBetweenTwoPoints with p1 in context
   const getDistanceFromUser = distanceBetweenTwoPoints(p1)
+  try {
+    // get user's liked shops
+    const likedShops = await getUserLikedShops(user_id, getDistanceFromUser)
+    // get user's disliked shops
+    const dislikedShops = await getUserDislikedShopsId(user_id)
 
-  Promise.all([
-    getUserLikedShops(user_id, getDistanceFromUser),
-    getUserDislikedShopsId(user_id)
-  ])
-    .then(dt => {
-      const [likedShops = [], dislikedShops = []] = dt
-      const excludedIds = likedShops.map(shop => shop.id).concat(dislikedShops)
-      ShopModel.all(excludedIds)
-        .then(shops => {
-          const nearShops = sortShopsByDistance(
-            shops,
-            getDistanceFromUser
-          ).slice(0, 30) // return 30 shops max
-
-          res.json({ shops: { near: nearShops, preferred: likedShops } })
-        })
-        .catch(err => {
-          console.log(chalk.red('failed to fetch shops', err))
-          rez.statusCode = 500
-          res.end()
-        })
-    })
-    .catch(err => {
-      console.log(chalk.red('failed to fetch liked/disliked shop', err))
-      rez.statusCode = 500
-      res.end()
-    })
+    // merge liked and disliked ids
+    const excludedIds = likedShops.map(shop => shop.id).concat(dislikedShops)
+    // list of shops with liked and disliked shops excluded
+    const shops = await ShopModel.all(excludedIds)
+    // calculate shops distance
+    // limited to 30 shops max
+    const nearShops = sortShopsByDistance(shops, getDistanceFromUser).slice(
+      0,
+      30
+    )
+    res.json({ shops: { near: nearShops, preferred: likedShops } })
+  } catch (err) {
+    console.log(chalk.red('failed to fetch liked/disliked shop', err))
+    res.statusCode = 500
+    res.end()
+  }
 }
 
 /**

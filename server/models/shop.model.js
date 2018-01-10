@@ -21,7 +21,7 @@ ShopSchema.statics = {
       .exec()
       .catch(err => {
         console.log(chalk.red('failed to fetch shops', err))
-        return err
+        throw err
       })
   }
 }
