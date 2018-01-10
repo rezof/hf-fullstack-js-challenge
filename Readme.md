@@ -1,5 +1,5 @@
 ## Prerequisites
-- Node.js >= 6.8.0
+- Node.js >= 7.10.1
 - npm ^3.x or yarn ^0.x
 - mongodb ^3.x
 
