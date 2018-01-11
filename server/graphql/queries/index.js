@@ -1,11 +1,13 @@
 const { GraphQLObjectType, GraphQLList } = require('graphql')
-const shops = require('./shops')
+const shopsQuery = require('./shops')
+const shopQuery = require('./shop')
 
 const queries = new GraphQLObjectType({
   name: 'rootQueries',
   description: 'root queries',
   fields: {
-    shops
+    shops: shopsQuery,
+    shop: shopQuery
   }
 })
 
