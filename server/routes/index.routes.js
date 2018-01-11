@@ -1,6 +1,8 @@
 const path = require('path')
 const express = require('express')
 const router = express.Router()
+
+const schema = require('../graphql/schema')
 const graphqlHTTP = require('express-graphql')
 
 const authRoutes = require('./auth.routes')
