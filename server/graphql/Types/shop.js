@@ -1,6 +1,5 @@
 const {
   GraphQLObjectType,
-  GraphQLSchema,
   GraphQLNonNull,
   GraphQLID,
   GraphQLString,
@@ -8,7 +7,7 @@ const {
 } = require('graphql')
 
 const shopType = new GraphQLObjectType({
-  name: 'shop',
+  name: 'shopType',
   fields: {
     id: {
       type: new GraphQLNonNull(GraphQLID)
