@@ -1,5 +1,6 @@
+const path = require('path')
 const { GraphQLString, GraphQLNonNull } = require('graphql')
-const shopType = require('../Types/shop')
+const { shopType } = require(path.resolve(__dirname, '../types'))
 const shopModel = require('../../models/shop.model')
 
 const shopQuery = {

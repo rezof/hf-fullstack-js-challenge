@@ -1,10 +1,11 @@
+const path = require('path')
 const {
   GraphQLObjectType,
   GraphQLList,
   GraphQLNonNull,
   GraphQLFloat
 } = require('graphql')
-const shopType = require('../Types/shop')
+const { shopType } = require(path.resolve(__dirname, '../types'))
 const shopModel = require('../../models/shop.model')
 
 const { distanceBetweenTwoPoints } = require('../../utils/index')
