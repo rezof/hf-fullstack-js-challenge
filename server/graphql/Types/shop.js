@@ -26,12 +26,7 @@ const shopType = new GraphQLObjectType({
       type: GraphQLString
     },
     distance: {
-      type: GraphQLFloat,
-      resolve(shop, args, context) {
-        // user should be in context
-        // TODO calculate distance between shop and user
-        return 0
-      }
+      type: GraphQLFloat
     }
   }
 })
