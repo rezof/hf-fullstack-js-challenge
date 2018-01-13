@@ -19,7 +19,7 @@ const likeMutation = {
     })
     const likedShop = {
       id: like._id,
-      shop: like.shop,
+      shop_id: like.shop,
       user_id: like.user_id
     }
     return likedShop

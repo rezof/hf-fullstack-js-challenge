@@ -12,14 +12,8 @@ const likeType = new GraphQLObjectType({
     user_id: {
       type: new GraphQLNonNull(GraphQLID)
     },
-    shop: {
-      type: shopType,
-      async resolve(like) {
-        // replace the shop id on the shop field
-        // with a shop type object
-        const likedShop = await ShopModel.findById(like.shop).exec()
-        return likedShop
-      }
+    shop_id: {
+      type: GraphQLID
     }
   }
 })
