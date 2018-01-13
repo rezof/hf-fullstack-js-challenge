@@ -1,10 +1,10 @@
 const path = require('path')
 const { GraphQLObjectType, GraphQLNonNull, GraphQLString } = require('graphql')
-const { likeType } = require(path.resolve(__dirname, '../types'))
+const { actionType } = require(path.resolve(__dirname, '../types'))
 const LikeModel = require('../../models/like.model')
 
 const likeMutation = {
-  type: likeType,
+  type: actionType,
   args: {
     shopId: {
       type: new GraphQLNonNull(GraphQLString)
