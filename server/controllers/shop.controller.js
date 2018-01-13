@@ -101,8 +101,7 @@ const getUserDislikedShopsId = user_id => {
 const getUserLikedShops = (user_id, getDistanceFromUser) => {
   return LikeModel.findByUser(user_id)
     .then(shops => {
-      throw new Error('hi')
-      // sortShopsByDistance(shops, getDistanceFromUser)
+      return sortShopsByDistance(shops, getDistanceFromUser)
     })
     .catch(err => {
       console.log(chalk.red('failed to load user liked shops', err))
