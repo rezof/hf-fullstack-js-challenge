@@ -17,8 +17,12 @@ const likeMutation = {
       user_id: id,
       shop: shopId
     })
-    like.populate('shop')
-    return like
+    const likedShop = {
+      id: like._id,
+      shop: like.shop,
+      user_id: like.user_id
+    }
+    return likedShop
   }
 }
 
