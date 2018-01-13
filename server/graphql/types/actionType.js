@@ -1,16 +1,16 @@
-const { GraphQLObjectType, GraphQLString, GraphQLNonNull } = require('graphql')
+const { GraphQLObjectType, GraphQLID, GraphQLNonNull } = require('graphql')
 
 const actionType = new GraphQLObjectType({
   name: 'actionType',
   fields: {
     id: {
-      type: GraphQLString
+      type: GraphQLID
     },
     user_id: {
-      type: GraphQLString
+      type: GraphQLID
     },
     shop_id: {
-      type: GraphQLString
+      type: GraphQLID
     }
   }
 })
