@@ -1,5 +1,5 @@
 const path = require('path')
-const { GraphQLString, GraphQLNonNull } = require('graphql')
+const { GraphQLID, GraphQLNonNull } = require('graphql')
 const { shopType } = require(path.resolve(__dirname, '../types'))
 const shopModel = require('../../models/shop.model')
 
@@ -7,7 +7,7 @@ const shopQuery = {
   type: shopType,
   args: {
     id: {
-      type: new GraphQLNonNull(GraphQLString)
+      type: new GraphQLNonNull(GraphQLID)
     }
   },
   async resolve(_, args) {
