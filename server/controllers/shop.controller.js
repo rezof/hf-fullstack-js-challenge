@@ -85,7 +85,7 @@ const sortShopsByDistance = (shops, getDistanceFromUser) => {
  * return promise
  */
 const getUserDislikedShopsId = user_id => {
-  return DislikeModel.findByUser(user_id)
+  return DislikeModel.findShopIdsByUser(user_id)
     .then(dislikes => dislikes.map(dislike => dislike.shop_id))
     .catch(err => {
       console.log(chalk.red('failed to load user liked shops', err))

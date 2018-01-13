@@ -7,7 +7,7 @@ const DislikeModel = new mongoose.Schema({
 })
 
 DislikeModel.statics = {
-  findByUser(user_id) {
+  findShopIdsByUser(user_id) {
     return this.find({ user_id })
       .select('shop_id')
       .exec()
